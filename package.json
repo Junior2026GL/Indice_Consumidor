@@ -1,0 +1,20 @@
+{
+  "name": "ipc-insep",
+  "private": true,
+  "version": "1.1.0",
+  "description": "IPC INSEP: API (Express + MySQL) y aplicación web (React + Vite)",
+  "scripts": {
+    "install:all": "npm --prefix backend ci && npm --prefix frontend ci",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "db:migrate": "npm --prefix backend run db:migrate",
+    "db:seed": "npm --prefix backend run db:seed",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
+    "test": "npm --prefix backend test && npm --prefix frontend test",
+    "build": "npm --prefix frontend run build",
+    "format": "prettier --write backend frontend/src"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}

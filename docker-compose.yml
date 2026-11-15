@@ -1,0 +1,52 @@
+# Entorno completo en contenedores:  cp .env.example .env  (edítalo)  &&  docker compose up --build
+# Sin tests de integración aquí: valida con `docker compose config` antes del primer arranque.
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?define DB_ROOT_PASSWORD en .env}
+      MYSQL_DATABASE: ${DB_NAME:-ipc_insep}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-uroot', '-p${DB_ROOT_PASSWORD}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # La base de datos no se publica al host: solo la ve el backend.
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: ${DB_ROOT_PASSWORD}
+      DB_NAME: ${DB_NAME:-ipc_insep}
+      JWT_SECRET: ${JWT_SECRET:?define JWT_SECRET en .env (mínimo 32 caracteres)}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
+      TRUST_PROXY: ${TRUST_PROXY:-0}
+      # En local sobre http no hay HTTPS: pon COOKIE_SECURE=true en producción con HTTPS.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    ports:
+      - '4000:4000'
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:4000/api}
+    restart: unless-stopped
+    environment:
+      API_ORIGIN: ${API_ORIGIN:-http://localhost:4000}
+    ports:
+      - '8080:8080'
+
+volumes:
+  db_data:

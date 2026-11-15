@@ -1,0 +1,35 @@
+-- Esquema inicial. El runner (npm run db:migrate) crea la base de datos y la selecciona,
+-- por eso aquí no hay CREATE DATABASE ni USE. Es idempotente (IF NOT EXISTS).
+
+CREATE TABLE IF NOT EXISTS roles (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(50) NOT NULL UNIQUE,
+  descripcion VARCHAR(255) NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS usuarios (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  rol_id BIGINT UNSIGNED NULL,
+  nombre VARCHAR(150) NOT NULL,
+  usuario VARCHAR(60) NOT NULL UNIQUE,
+  email VARCHAR(180) NULL,
+  telefono VARCHAR(30) NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  activo TINYINT(1) NOT NULL DEFAULT 1,
+  ultimo_acceso_at DATETIME NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_usuario_rol FOREIGN KEY (rol_id) REFERENCES roles(id)
+);
+
+CREATE TABLE IF NOT EXISTS auditoria (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  usuario_id BIGINT UNSIGNED NULL,
+  accion VARCHAR(100) NOT NULL,
+  modulo VARCHAR(100) NOT NULL,
+  descripcion TEXT NULL,
+  ip VARCHAR(64) NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_auditoria_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
+);
