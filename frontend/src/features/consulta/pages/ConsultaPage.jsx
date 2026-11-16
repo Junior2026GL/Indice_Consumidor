@@ -3,7 +3,7 @@ import { IconAlert, IconCheck, IconSearch } from '../../../components/icons.jsx'
 import { getErrorMessage } from '../../../services/api.js';
 import { copyText } from '../../../utils/clipboard.js';
 import { useAuth } from '../../auth/AuthContext.jsx';
-import { formatDateTime } from '../../../utils/format.js';
+import { formatDateTime, initials } from '../../../utils/format.js';
 import { anularEntrega, buscarPorDni, marcarEntrega } from '../services/beneficiarios.service.js';
 
 const DNI_LENGTH = 13;
@@ -304,7 +304,7 @@ function ResultModal({ children, onClose }) {
 }
 
 export default function ConsultaPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const inputRef = useRef(null);
   const [dni, setDni] = useState('');
   const [result, setResult] = useState(null); // null = aún no se busca
@@ -378,6 +378,34 @@ export default function ConsultaPage() {
           </div>
           <p>Consulta de beneficiarios</p>
         </div>
+
+        {user && (
+          <div className="consulta-user">
+            <span className="consulta-user-avatar" aria-hidden="true">
+              {initials(user.nombre)}
+            </span>
+            <span className="consulta-user-name" title={user.nombre}>
+              {user.nombre}
+            </span>
+            <button type="button" className="consulta-user-exit" onClick={logout}>
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <path d="m16 17 5-5-5-5M21 12H9" />
+              </svg>
+              Salir
+            </button>
+          </div>
+        )}
       </header>
 
       <main className="consulta">

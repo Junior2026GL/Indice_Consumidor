@@ -3547,3 +3547,24 @@ tbody tr:last-child td { border-bottom: 0; }
   .rmodal { border-radius: 24px; max-height: 88vh; box-shadow: 0 30px 80px rgba(8, 24, 56, .4); }
 }
 @media (prefers-reduced-motion: reduce) { .rmodal, .rmodal-overlay { animation: none; } }
+
+/* Consulta: usuario y botón Salir dentro del encabezado */
+.consulta-header { flex-wrap: wrap; }
+.consulta-user { margin-left: auto; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.consulta-user-avatar {
+  flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 12px; font-weight: 800; color: #0b2f6b; background: #59d38c;
+}
+.consulta-user-name { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 700; color: #fff; }
+.consulta-user-exit {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px;
+  border-radius: 12px; border: 1px solid rgba(255, 255, 255, .28); background: rgba(255, 255, 255, .12);
+  color: #fff; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: background .15s;
+}
+.consulta-user-exit:hover { background: rgba(255, 255, 255, .24); }
+.consulta-user-exit:active { transform: scale(.97); }
+@media (max-width: 480px) {
+  /* En celular el usuario pasa a una segunda fila para que el nombre no se corte */
+  .consulta-user { flex-basis: 100%; margin: 4px 0 0; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, .18); }
+  .consulta-user-name { flex: 1; max-width: none; font-size: 14px; }
+}
