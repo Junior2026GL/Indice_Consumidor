@@ -3452,19 +3452,32 @@ tbody tr:last-child td { border-bottom: 0; }
 .resultado .entrega-icon { display: grid; place-items: center; font-size: 0; letter-spacing: 0; text-transform: none; color: #fff; margin: 0; }
 .entrega-icon svg { display: block; }
 
-/* ===== Login: bloque de bienvenida sobre la tarjeta (solo escritorio) ===== */
-.login-panel { align-content: center; gap: 22px; }
-.login-welcome { display: grid; justify-items: center; gap: 8px; text-align: center; }
-.login-welcome-icon {
-  width: 68px; height: 68px; border-radius: 22px; display: grid; place-items: center;
+/* ===== Login: solo la tarjeta, centrada y adaptada a celular ===== */
+.login-shell {
+  min-height: 100vh; min-height: 100dvh; display: grid; place-items: center;
+  padding: calc(20px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));
+  background: radial-gradient(60% 45% at 50% 0%, #dbe8ff 0%, transparent 70%), var(--color-bg);
+}
+.login-box { width: 100%; max-width: 440px; min-height: 0; display: block; border-radius: 0; overflow: visible; box-shadow: none; background: none; }
+.login-panel { display: block; padding: 0; margin: 0; background: none; }
+.login-card { width: 100%; max-width: none; padding: 32px 24px 26px; box-shadow: 0 18px 48px rgba(11, 47, 107, .16); }
+.login-card-head { margin-bottom: 6px; }
+.login-card-head .brand { display: block; font-size: 34px; }
+.login-card-head p { font-size: 16px; font-weight: 600; color: var(--color-text); }
+.login-card input { min-height: 52px; font-size: 16px; }
+.login-card button.btn-primary { min-height: 54px; font-size: 17px; }
+@media (max-width: 380px) { .login-card { padding: 26px 16px 20px; } }
+
+/* Login: pulido visual de la tarjeta */
+.login-card { border-radius: 26px; border: 1px solid #e3ebfa; }
+.login-card-head { display: grid; justify-items: center; gap: 4px; margin-bottom: 14px; }
+.login-logo {
+  width: 62px; height: 62px; border-radius: 20px; display: grid; place-items: center; margin-bottom: 8px;
   background: linear-gradient(145deg, #2a78d6, #0b2f6b);
-  box-shadow: 0 14px 30px rgba(11, 87, 208, .32), inset 0 1px 0 rgba(255, 255, 255, .3);
+  box-shadow: 0 12px 26px rgba(11, 87, 208, .32), inset 0 1px 0 rgba(255, 255, 255, .3);
 }
-.login-welcome h2 { margin: 6px 0 0; font-size: 26px; font-weight: 800; letter-spacing: -.02em; color: var(--color-primary-dark); }
-.login-welcome p { margin: 0; color: var(--color-muted); font-size: 15px; }
-.login-welcome-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
-.login-welcome-chips span {
-  font-size: 12px; font-weight: 700; color: var(--color-primary); background: var(--color-primary-soft);
-  border: 1px solid #d6e4ff; border-radius: 999px; padding: 5px 12px;
-}
-@media (max-width: 900px) { .login-welcome { display: none; } }
+.login-card-head p { margin: 2px 0 0; font-size: 15px; font-weight: 700; color: var(--color-primary-dark); }
+.login-card-head small { color: var(--color-muted); font-size: 13px; }
+.login-card label { font-size: 13px; font-weight: 700; }
+.login-card input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 4px rgba(11, 87, 208, .14); outline: none; }
+.login-card button.btn-primary { margin-top: 10px; border-radius: 14px; }
