@@ -4,6 +4,7 @@ import DonutChart from '../../../components/DonutChart.jsx';
 import { IconAlert, IconCheck, IconShield, IconUsers } from '../../../components/icons.jsx';
 import { getErrorMessage } from '../../../services/api.js';
 import { getBeneficiariosResumen } from '../services/dashboard.service.js';
+import { getResumen as getEntregasPorUsuario } from '../../entregas/services/entregas.service.js';
 
 const MAX_GROUP_SLICES = 8; // hasta 8 grupos con color propio; si hubiera más, el resto se agrupa en "Otros"
 const SERIES = [
@@ -49,13 +50,47 @@ function buildGroupSlices(porGrupo) {
   return slices;
 }
 
+/** Entregas por usuario: el color sigue al usuario (orden por id), no a su posición en el ranking. */
+function buildUserSlices(usuarios) {
+  const top = usuarios.slice(0, MAX_GROUP_SLICES);
+  const rest = usuarios.slice(MAX_GROUP_SLICES);
+  const colorOf = new Map(
+    [...top]
+      .sort((a, b) => (a.usuario_id ?? Infinity) - (b.usuario_id ?? Infinity))
+      .map((u, index) => [u.usuario_id, SERIES[index]])
+  );
+
+  const slices = top.map((u) => ({
+    key: `u-${u.usuario_id ?? 'none'}`,
+    label: u.nombre || 'Usuario eliminado',
+    value: u.total,
+    color: colorOf.get(u.usuario_id),
+  }));
+
+  if (rest.length) {
+    slices.push({
+      key: 'otros',
+      label: `Otros (${rest.length} usuarios)`,
+      value: rest.reduce((sum, u) => sum + u.total, 0),
+      color: 'var(--series-other)',
+    });
+  }
+  return slices;
+}
+
 export default function DashboardPage() {
   const [data, setData] = useState(null);
+  const [porUsuario, setPorUsuario] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const load = useCallback((signal, fresh = false) => {
     setLoading(true);
+    // Entregas por usuario: si falla, el resto del dashboard se muestra igual.
+    getEntregasPorUsuario()
+      .then((r) => !signal?.aborted && setPorUsuario(r.usuarios))
+      .catch(() => {});
+
     getBeneficiariosResumen({ signal, fresh })
       .then((result) => {
         setData(result);
@@ -87,6 +122,7 @@ export default function DashboardPage() {
         : [],
     [data]
   );
+  const userSlices = useMemo(() => buildUserSlices(porUsuario), [porUsuario]);
   const accountSlices = useMemo(
     () =>
       data
@@ -178,6 +214,11 @@ export default function DashboardPage() {
             <section className="panel dashb-card">
               <h3 className="panel-title">Beneficiarios por grupo</h3>
               <DonutChart slices={groupSlices} totalLabel="Beneficiarios" />
+            </section>
+
+            <section className="panel dashb-card">
+              <h3 className="panel-title">Entregas por usuario</h3>
+              <DonutChart slices={userSlices} totalLabel="Entregas" />
             </section>
 
             <section className="panel dashb-card">
