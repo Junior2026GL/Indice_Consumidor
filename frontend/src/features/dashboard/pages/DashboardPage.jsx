@@ -84,8 +84,9 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const load = useCallback((signal, fresh = false) => {
-    setLoading(true);
+  // silent: actualización automática, sin el parpadeo de "cargando".
+  const load = useCallback((signal, fresh = false, silent = false) => {
+    if (!silent) setLoading(true);
     // Entregas por usuario: si falla, el resto del dashboard se muestra igual.
     getEntregasPorUsuario()
       .then((r) => !signal?.aborted && setPorUsuario(r.usuarios))
@@ -97,11 +98,11 @@ export default function DashboardPage() {
         setError('');
       })
       .catch((err) => {
-        if (signal?.aborted) return;
+        if (signal?.aborted || silent) return;
         setError(getErrorMessage(err, 'No se pudo cargar el dashboard'));
       })
       .finally(() => {
-        if (!signal?.aborted) setLoading(false);
+        if (!signal?.aborted && !silent) setLoading(false);
       });
   }, []);
 
@@ -109,6 +110,19 @@ export default function DashboardPage() {
     const controller = new AbortController();
     load(controller.signal);
     return () => controller.abort();
+  }, [load]);
+
+  // Se actualiza solo cada 30 s mientras la pestaña está a la vista, y al volver a ella.
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === 'visible') load(undefined, false, true);
+    };
+    const timer = setInterval(refresh, 30_000);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', refresh);
+    };
   }, [load]);
 
   const groupSlices = useMemo(() => (data ? buildGroupSlices(data.porGrupo) : []), [data]);
@@ -228,8 +242,8 @@ export default function DashboardPage() {
           </div>
 
           <p className="dashb-updated">
-            Actualizado: {new Date(data.actualizado).toLocaleString('es')} · los datos se refrescan cada
-            minuto como máximo.
+            Actualizado: {new Date(data.actualizado).toLocaleString('es')} · se actualiza solo cada 30
+            segundos.
           </p>
         </div>
       )}

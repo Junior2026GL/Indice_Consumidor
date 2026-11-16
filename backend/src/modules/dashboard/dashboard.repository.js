@@ -1,6 +1,7 @@
 import { db } from '../../infrastructure/database/mysql.js';
 
-export async function getBeneficiariosResumen() {
+/** Cifras pesadas de beneficiarios (recorren toda la tabla): el servicio las guarda unos segundos. */
+export async function getBeneficiariosTotales() {
   const [[totales]] = await db.query(
     `SELECT COUNT(*) AS total,
             COUNT(DISTINCT identificador) AS unicos,
@@ -16,7 +17,11 @@ export async function getBeneficiariosResumen() {
      LIMIT 200`
   );
 
-  const [[entregas]] = await db.query('SELECT COUNT(*) AS entregados FROM entregas');
+  return { totales, grupos };
+}
 
-  return { totales, grupos, entregados: entregas.entregados };
+/** Entregas registradas: consulta mínima, se pide en cada carga para que el panel esté siempre al día. */
+export async function contarEntregas() {
+  const [[row]] = await db.query('SELECT COUNT(*) AS entregados FROM entregas');
+  return Number(row.entregados);
 }
