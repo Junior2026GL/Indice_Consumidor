@@ -7,12 +7,13 @@ export async function login(credentials) {
   return data.data.user;
 }
 
-export async function logout() {
-  try {
-    await authClient.post('/auth/logout');
-  } finally {
-    setAccessToken(null);
-  }
+/**
+ * Cierra la sesión al instante en este equipo (borra el token) y avisa al servidor en segundo plano:
+ * así el usuario no espera a la red para volver al login. Si el aviso falla, la cookie vence sola.
+ */
+export function logout() {
+  setAccessToken(null);
+  authClient.post('/auth/logout', null, { timeout: 8000 }).catch(() => {});
 }
 
 export async function changeMyPassword({ currentPassword, newPassword }) {

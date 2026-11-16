@@ -3579,3 +3579,11 @@ tbody tr:last-child td { border-bottom: 0; }
 .consulta { max-width: 480px; }
 .consulta-header { max-width: 448px; }
 .consulta-input { text-align: left; padding-left: 18px; letter-spacing: 3px; }
+
+/* Modal del resultado: aparece arriba (también en celular) */
+.rmodal-overlay { align-items: flex-start; padding-top: calc(10px + env(safe-area-inset-top)); }
+.rmodal { border-radius: 24px; max-height: calc(100dvh - 24px); animation-name: rmodal-down; }
+@keyframes rmodal-down { from { transform: translateY(-30px); opacity: 0; } }
+@media (max-width: 699px) {
+  .rmodal-overlay { padding-left: 10px; padding-right: 10px; }
+}

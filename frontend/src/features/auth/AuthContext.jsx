@@ -32,12 +32,9 @@ export function AuthProvider({ children }) {
     return user;
   }, []);
 
-  const logout = useCallback(async () => {
-    try {
-      await authService.logout();
-    } finally {
-      setState({ status: 'anonymous', user: null });
-    }
+  const logout = useCallback(() => {
+    authService.logout();
+    setState({ status: 'anonymous', user: null });
   }, []);
 
   const changePassword = useCallback(async (payload) => {
