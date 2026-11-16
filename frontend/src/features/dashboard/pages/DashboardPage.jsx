@@ -5,13 +5,16 @@ import { IconAlert, IconCheck, IconShield, IconUsers } from '../../../components
 import { getErrorMessage } from '../../../services/api.js';
 import { getBeneficiariosResumen } from '../services/dashboard.service.js';
 
-const MAX_GROUP_SLICES = 5; // las demás se agrupan en "Otros" para que el pastel siga siendo legible
+const MAX_GROUP_SLICES = 8; // hasta 8 grupos con color propio; si hubiera más, el resto se agrupa en "Otros"
 const SERIES = [
   'var(--series-1)',
   'var(--series-2)',
   'var(--series-3)',
   'var(--series-4)',
   'var(--series-5)',
+  'var(--series-6)',
+  'var(--series-7)',
+  'var(--series-8)',
 ];
 
 const fmt = (n) => Number(n ?? 0).toLocaleString('es');
