@@ -3481,3 +3481,20 @@ tbody tr:last-child td { border-bottom: 0; }
 .login-card label { font-size: 13px; font-weight: 700; }
 .login-card input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 4px rgba(11, 87, 208, .14); outline: none; }
 .login-card button.btn-primary { margin-top: 10px; border-radius: 14px; }
+
+/* Consulta: encabezado compacto en fila (más espacio para el resultado en el celular) */
+.consulta-header {
+  display: flex; align-items: center; justify-content: center; gap: 14px; text-align: left;
+  padding: 16px 20px 46px; padding-top: calc(16px + env(safe-area-inset-top));
+  border-radius: 0 0 24px 24px;
+  background: linear-gradient(135deg, #0b2f6b 0%, #0a3d7a 60%, #0d5a5f 120%);
+  box-shadow: 0 6px 20px rgba(8, 36, 80, .22);
+}
+.consulta-logo {
+  flex: 0 0 auto; width: 48px; height: 48px; border-radius: 15px; display: grid; place-items: center;
+  background: linear-gradient(145deg, #2a78d6, #0b57d0);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+.consulta-header-text .brand { margin: 0; font-size: 24px; line-height: 1.1; }
+.consulta-header-text p { margin: 2px 0 0; font-size: 13px; letter-spacing: .02em; }
+.consulta-shell .consulta { margin-top: -28px; }

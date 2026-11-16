@@ -308,10 +308,27 @@ export default function ConsultaPage() {
   return (
     <div className="consulta-shell">
       <header className="consulta-header">
-        <div className="brand large light">
-          IPC <span>INSEP</span>
+        <span className="consulta-logo" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            width="26"
+            height="26"
+            fill="none"
+            stroke="#fff"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="m20 20-4.2-4.2" />
+          </svg>
+        </span>
+        <div className="consulta-header-text">
+          <div className="brand light">
+            IPC <span>INSEP</span>
+          </div>
+          <p>Consulta de beneficiarios</p>
         </div>
-        <p>Consulta de beneficiarios</p>
       </header>
 
       <main className="consulta">
