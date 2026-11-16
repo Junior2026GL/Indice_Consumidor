@@ -3587,3 +3587,55 @@ tbody tr:last-child td { border-bottom: 0; }
 @media (max-width: 699px) {
   .rmodal-overlay { padding-left: 10px; padding-right: 10px; }
 }
+
+/* ===== Módulo Entregas ===== */
+.ent-summary { display: grid; gap: 14px; margin-bottom: 18px; }
+.ent-total {
+  display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: 18px; color: #fff;
+  background: linear-gradient(135deg, #0b2f6b 0%, #0a3d7a 60%, #0d5a5f 120%); box-shadow: 0 10px 26px rgba(8, 36, 80, .18);
+}
+.ent-total-icon { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: rgba(255, 255, 255, .16); }
+.ent-total small { display: block; font-size: 12.5px; color: rgba(255, 255, 255, .75); }
+.ent-total strong { font-size: 30px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+.ent-users { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.ent-muted { color: var(--color-muted); margin: 0; }
+.ent-user {
+  display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; padding: 12px 14px; cursor: pointer;
+  background: #fff; border: 1px solid var(--color-border); border-radius: 16px; font: inherit; color: inherit;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, .04); transition: border-color .15s, box-shadow .15s;
+}
+.ent-user:hover:not(:disabled) { border-color: var(--color-primary); box-shadow: 0 6px 16px rgba(11, 87, 208, .12); }
+.ent-user.active { border-color: var(--color-primary); background: var(--color-primary-soft); }
+.ent-user:disabled { cursor: default; }
+.ent-avatar {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  font-weight: 800; font-size: 14px; color: #0b2f6b; background: #cfeedd;
+}
+.ent-user-info { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.ent-user-info strong { font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ent-user-info small { font-size: 12px; color: var(--color-muted); }
+.ent-bar { display: block; height: 5px; border-radius: 5px; background: #e7ecf4; overflow: hidden; margin-top: 4px; }
+.ent-bar span { display: block; height: 100%; background: #1fa563; border-radius: 5px; }
+.ent-count { font-size: 24px; font-weight: 800; color: #146c43; font-variant-numeric: tabular-nums; }
+
+.ent-filters { margin-bottom: 4px; }
+.ent-list { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 10px; }
+.ent-list.is-refreshing { opacity: .6; transition: opacity .15s; }
+.ent-row {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #fff;
+  border: 1px solid var(--color-border); border-radius: 16px; box-shadow: 0 2px 8px rgba(16, 24, 40, .04);
+}
+.ent-row-icon { flex: 0 0 auto; width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; color: #146c43; background: #e6f7ee; }
+.ent-row-main { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.ent-dni { font-size: 16px; letter-spacing: .5px; font-variant-numeric: tabular-nums; }
+.ent-row-main small { color: var(--color-muted); font-size: 12.5px; }
+.ent-row-meta { display: grid; gap: 4px; justify-items: end; text-align: right; font-size: 12.5px; color: var(--color-muted); }
+.ent-row-meta svg { vertical-align: -2px; }
+.ent-row-user { font-weight: 700; color: var(--color-text); }
+.ent-row-meta time { font-variant-numeric: tabular-nums; }
+@media (max-width: 600px) {
+  /* En celular: fecha y usuario pasan debajo del DNI */
+  .ent-row { flex-wrap: wrap; }
+  .ent-row-main { flex-basis: calc(100% - 52px); }
+  .ent-row-meta { flex-basis: 100%; justify-items: start; text-align: left; grid-auto-flow: column; gap: 14px; padding-top: 8px; border-top: 1px dashed var(--color-border); }
+}

@@ -4,6 +4,7 @@ import usersRoutes from '../modules/users/users.routes.js';
 import auditRoutes from '../modules/audit/audit.routes.js';
 import beneficiariosRoutes from '../modules/beneficiarios/beneficiarios.routes.js';
 import dashboardRoutes from '../modules/dashboard/dashboard.routes.js';
+import entregasRoutes from '../modules/entregas/entregas.routes.js';
 import { authRequired } from '../shared/middleware/auth.middleware.js';
 import { pingDatabase } from '../infrastructure/database/mysql.js';
 import { asyncHandler } from '../shared/utils/asyncHandler.js';
@@ -34,6 +35,7 @@ router.use('/auth', authRoutes);
 router.use(authRequired);
 router.use('/beneficiarios', beneficiariosRoutes);
 router.use('/dashboard', dashboardRoutes);
+router.use('/entregas', entregasRoutes);
 router.use('/users', usersRoutes);
 router.use('/auditoria', auditRoutes);
 

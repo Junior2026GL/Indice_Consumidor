@@ -1,11 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { IconDashboard, IconUsers, IconLogbook, IconSearch } from '../components/icons.jsx';
+import { IconDashboard, IconUsers, IconLogbook, IconSearch, IconDelivery } from '../components/icons.jsx';
 import { useAuth } from '../features/auth/AuthContext.jsx';
 import UserMenu from './UserMenu.jsx';
 
 const menu = [
   ['/dashboard', 'Dashboard', IconDashboard],
   ['/usuarios', 'Usuarios', IconUsers],
+  ['/entregas', 'Entregas', IconDelivery],
   ['/auditoria', 'Bitácora', IconLogbook],
 ];
 

@@ -366,3 +366,13 @@ export function IconDownload(props) {
     </svg>
   );
 }
+
+export function IconDelivery(props) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="8" y="2.5" width="8" height="3.5" rx="1" />
+      <path d="M16 4h1.5A1.5 1.5 0 0 1 19 5.5v14a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5v-14A1.5 1.5 0 0 1 6.5 4H8" />
+      <path d="m9 14 2 2 4-4" />
+    </svg>
+  );
+}

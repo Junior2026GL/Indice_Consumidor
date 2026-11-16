@@ -254,7 +254,7 @@ function ResultCard({ item, isSuperAdmin, onChanged }) {
   );
 }
 
-/** Ventana con el resultado: hoja inferior en celular, centrada en escritorio. Esc o tocar fuera la cierra. */
+/** Ventana con el resultado. Tocar fuera NO la cierra: solo la X, Esc o "Nueva consulta". */
 function ResultModal({ children, onClose }) {
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
@@ -268,7 +268,7 @@ function ResultModal({ children, onClose }) {
   }, [onClose]);
 
   return (
-    <div className="rmodal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="rmodal-overlay">
       <div className="rmodal" role="dialog" aria-modal="true" aria-label="Resultado de la consulta">
         <header className="rmodal-head">
           <div>

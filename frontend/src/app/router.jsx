@@ -10,6 +10,7 @@ const ConsultaPage = lazy(() => import('../features/consulta/pages/ConsultaPage.
 const LoginPage = lazy(() => import('../features/auth/pages/LoginPage.jsx'));
 const DashboardPage = lazy(() => import('../features/dashboard/pages/DashboardPage.jsx'));
 const UsersPage = lazy(() => import('../features/users/pages/UsersPage.jsx'));
+const EntregasPage = lazy(() => import('../features/entregas/pages/EntregasPage.jsx'));
 const AuditPage = lazy(() => import('../features/audit/pages/AuditPage.jsx'));
 
 const page = (element) => <Suspense fallback={<PageLoader />}>{element}</Suspense>;
@@ -57,6 +58,7 @@ export const router = createBrowserRouter([
         children: [
           { path: '/dashboard', element: page(<DashboardPage />) },
           { path: '/usuarios', element: page(<UsersPage />) },
+          { path: '/entregas', element: page(<EntregasPage />) },
           { path: '/auditoria', element: page(<AuditPage />) },
         ],
       },
