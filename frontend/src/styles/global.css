@@ -3451,3 +3451,20 @@ tbody tr:last-child td { border-bottom: 0; }
 /* El ícono de entrega no debe heredar el estilo de texto de '.resultado span' */
 .resultado .entrega-icon { display: grid; place-items: center; font-size: 0; letter-spacing: 0; text-transform: none; color: #fff; margin: 0; }
 .entrega-icon svg { display: block; }
+
+/* ===== Login: bloque de bienvenida sobre la tarjeta (solo escritorio) ===== */
+.login-panel { align-content: center; gap: 22px; }
+.login-welcome { display: grid; justify-items: center; gap: 8px; text-align: center; }
+.login-welcome-icon {
+  width: 68px; height: 68px; border-radius: 22px; display: grid; place-items: center;
+  background: linear-gradient(145deg, #2a78d6, #0b2f6b);
+  box-shadow: 0 14px 30px rgba(11, 87, 208, .32), inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+.login-welcome h2 { margin: 6px 0 0; font-size: 26px; font-weight: 800; letter-spacing: -.02em; color: var(--color-primary-dark); }
+.login-welcome p { margin: 0; color: var(--color-muted); font-size: 15px; }
+.login-welcome-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+.login-welcome-chips span {
+  font-size: 12px; font-weight: 700; color: var(--color-primary); background: var(--color-primary-soft);
+  border: 1px solid #d6e4ff; border-radius: 999px; padding: 5px 12px;
+}
+@media (max-width: 900px) { .login-welcome { display: none; } }

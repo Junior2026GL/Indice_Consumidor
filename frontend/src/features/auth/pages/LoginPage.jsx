@@ -40,6 +40,31 @@ export default function LoginPage() {
         </aside>
 
         <div className="login-panel">
+          {/* Bienvenida sobre la tarjeta; en celular se oculta porque la marca ya está en el encabezado */}
+          <div className="login-welcome">
+            <span className="login-welcome-icon" aria-hidden="true">
+              <svg
+                viewBox="0 0 24 24"
+                width="34"
+                height="34"
+                fill="none"
+                stroke="#fff"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="m20 20-4.2-4.2" />
+              </svg>
+            </span>
+            <h2>Bienvenido</h2>
+            <p>Sistema de consulta de beneficiarios</p>
+            <div className="login-welcome-chips">
+              <span>Consulta por DNI</span>
+              <span>Registro de entregas</span>
+            </div>
+          </div>
+
           <form className="login-card" onSubmit={submit}>
             <div className="login-card-head">
               <div className="brand large">
