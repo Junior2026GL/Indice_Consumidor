@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IconAlert, IconCheck, IconSearch } from '../../../components/icons.jsx';
 import { getErrorMessage } from '../../../services/api.js';
 import { copyText } from '../../../utils/clipboard.js';
@@ -254,6 +254,55 @@ function ResultCard({ item, isSuperAdmin, onChanged }) {
   );
 }
 
+/** Ventana con el resultado: hoja inferior en celular, centrada en escritorio. Esc o tocar fuera la cierra. */
+function ResultModal({ children, onClose }) {
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden'; // el fondo no se desplaza detrás del modal
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [onClose]);
+
+  return (
+    <div className="rmodal-overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="rmodal" role="dialog" aria-modal="true" aria-label="Resultado de la consulta">
+        <header className="rmodal-head">
+          <div>
+            <strong>Resultado de la consulta</strong>
+            <span>Información del beneficiario</span>
+          </div>
+          <button type="button" className="rmodal-close" onClick={onClose} aria-label="Cerrar">
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            >
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </header>
+
+        <div className="rmodal-body">{children}</div>
+
+        <footer className="rmodal-foot">
+          <button type="button" className="consulta-new" onClick={onClose}>
+            <IconRefresh width={18} height={18} />
+            Nueva consulta
+          </button>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
 export default function ConsultaPage() {
   const { user } = useAuth();
   const inputRef = useRef(null);
@@ -379,39 +428,33 @@ export default function ConsultaPage() {
             </div>
           )}
 
-          {result && !result.encontrado && (
-            <div className="consulta-empty">
+        </div>
+
+        <footer className="consulta-footer">© {new Date().getFullYear()} IPC INSEP</footer>
+      </main>
+
+      {result && (
+        <ResultModal onClose={clear}>
+          {!result.encontrado ? (
+            <div className="consulta-empty modal-empty">
               <span className="consulta-empty-icon">
                 <IconSearch width={26} height={26} />
               </span>
               <strong>Sin resultados</strong>
               <p>No se encontró ningún beneficiario con el DNI {dni}.</p>
-              <button type="button" className="consulta-new" onClick={clear}>
-                <IconRefresh width={18} height={18} />
-                Nueva consulta
-              </button>
             </div>
+          ) : (
+            result.items.map((item, index) => (
+              <ResultCard
+                key={`${item.num}-${index}`}
+                item={item}
+                isSuperAdmin={user?.rol === 'SUPER_ADMIN'}
+                onChanged={refresh}
+              />
+            ))
           )}
-
-          {result?.items.map((item, index) => (
-            <ResultCard
-              key={`${item.num}-${index}`}
-              item={item}
-              isSuperAdmin={user?.rol === 'SUPER_ADMIN'}
-              onChanged={refresh}
-            />
-          ))}
-
-          {result?.encontrado && (
-            <button type="button" className="consulta-new consulta-again" onClick={clear}>
-              <IconRefresh width={18} height={18} />
-              Nueva consulta
-            </button>
-          )}
-        </div>
-
-        <footer className="consulta-footer">© {new Date().getFullYear()} IPC INSEP</footer>
-      </main>
+        </ResultModal>
+      )}
     </div>
   );
 }
