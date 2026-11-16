@@ -44,6 +44,7 @@ const accionLabels = {
   LOGOUT: 'Cierre de sesión',
   ENTREGAR: 'Entrega',
   ANULAR_ENTREGA: 'Entrega anulada',
+  VACIAR_ENTREGAS: 'Entregas vaciadas',
   CONSULTAR: 'Consulta',
   LOGIN_FALLIDO: 'Inicio fallido',
   CAMBIO_PASSWORD: 'Cambio de contraseña',
@@ -59,6 +60,7 @@ const accionTones = {
   LOGOUT: 'gray',
   ENTREGAR: 'green',
   ANULAR_ENTREGA: 'red',
+  VACIAR_ENTREGAS: 'red',
   CONSULTAR: 'blue',
   LOGIN_FALLIDO: 'red',
   CAMBIO_PASSWORD: 'purple',
@@ -74,6 +76,7 @@ const accionIcons = {
   LOGOUT: IconLogout,
   ENTREGAR: IconCheck,
   ANULAR_ENTREGA: IconAlert,
+  VACIAR_ENTREGAS: IconAlert,
   CONSULTAR: IconSearch,
   LOGIN_FALLIDO: IconAlert,
   CAMBIO_PASSWORD: IconKey,
@@ -85,7 +88,7 @@ const accionIcons = {
 };
 
 // Debe coincidir con ACCIONES_ALERTA del backend (audit.repository.js).
-const ACCIONES_ALERTA = new Set(['LOGIN_FALLIDO', 'ANULAR_ENTREGA', 'DESACTIVAR']);
+const ACCIONES_ALERTA = new Set(['LOGIN_FALLIDO', 'ANULAR_ENTREGA', 'VACIAR_ENTREGAS', 'DESACTIVAR']);
 
 function initials(name) {
   if (!name) return '?';

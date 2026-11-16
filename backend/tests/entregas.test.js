@@ -41,7 +41,7 @@ function mockDb(session) {
         undefined,
       ];
     }
-    if (sql.includes('COUNT(*) AS total FROM entregas')) return [[{ total: '2' }], undefined];
+    if (sql.includes('COUNT(*) AS total FROM entregas')) return [[{ total: '5' }], undefined];
     if (sql.includes('ORDER BY e.entregado_at DESC')) {
       return [
         [
@@ -92,7 +92,7 @@ describe('/api/entregas', () => {
       .get('/api/entregas?usuarioId=2&desde=2026-11-01&hasta=2026-11-30&q=0801&page=1')
       .set('Authorization', bearer(SUPER));
     expect(res.status).toBe(200);
-    expect(res.body.data.total).toBe(2);
+    expect(res.body.data.total).toBe(5);
     expect(res.body.data.items[0]).toMatchObject({ identificador: '0801199012345', usuario_nombre: 'Ana' });
 
     const listCall = query.mock.calls.find(([sql]) => sql.includes('ORDER BY e.entregado_at DESC'));
@@ -107,5 +107,46 @@ describe('/api/entregas', () => {
     expect((await request(app).get('/api/entregas?q=abc').set('Authorization', bearer(SUPER))).status).toBe(
       400
     );
+  });
+
+  describe('DELETE /api/entregas (vaciar)', () => {
+    const vaciar = (user, body) =>
+      request(app).delete('/api/entregas').set('Authorization', bearer(user)).send(body);
+    const ran = (fragment) => query.mock.calls.some(([sql]) => sql.includes(fragment));
+
+    it('un usuario NORMAL no puede (403) y no se toca la tabla', async () => {
+      mockDb(NORMAL);
+      expect((await vaciar(NORMAL, { confirmacion: 'VACIAR' })).status).toBe(403);
+      expect(ran('TRUNCATE')).toBe(false);
+    });
+
+    it('sin la palabra de confirmación: 400 y no borra nada', async () => {
+      mockDb(SUPER);
+      expect((await vaciar(SUPER, {})).status).toBe(400);
+      expect((await vaciar(SUPER, { confirmacion: 'vaciar' })).status).toBe(400);
+      expect(ran('TRUNCATE')).toBe(false);
+    });
+
+    it('Super Admin con confirmación: vacía, informa cuántas había y audita', async () => {
+      mockDb(SUPER);
+      const res = await vaciar(SUPER, { confirmacion: 'VACIAR' });
+      expect(res.status).toBe(200);
+      expect(res.body.data.eliminadas).toBe(5);
+      expect(ran('TRUNCATE TABLE entregas')).toBe(true);
+      const log = query.mock.calls.find(([sql]) => sql.includes('INSERT INTO auditoria'));
+      expect(log[1][1]).toBe('VACIAR_ENTREGAS');
+    });
+
+    it('sin permiso DROP usa DELETE como respaldo', async () => {
+      query.mockImplementation(async (sql) => {
+        if (sql.includes('WHERE u.id = ? AND u.activo = 1')) return [[SUPER], undefined];
+        if (sql.includes('COUNT(*) AS total FROM entregas')) return [[{ total: '5' }], undefined];
+        if (sql.includes('TRUNCATE'))
+          throw Object.assign(new Error('denied'), { code: 'ER_TABLEACCESS_DENIED_ERROR' });
+        return [[], undefined];
+      });
+      expect((await vaciar(SUPER, { confirmacion: 'VACIAR' })).status).toBe(200);
+      expect(ran('DELETE FROM entregas')).toBe(true);
+    });
   });
 });

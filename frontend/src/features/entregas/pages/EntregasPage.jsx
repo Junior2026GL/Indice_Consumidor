@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react';
 import PageHeader from '../../../components/PageHeader.jsx';
 import Pagination from '../../../components/Pagination.jsx';
-import { IconClock, IconDelivery, IconSearch, IconUsers } from '../../../components/icons.jsx';
+import {
+  IconAlert,
+  IconClock,
+  IconDelivery,
+  IconSearch,
+  IconTrash,
+  IconUsers,
+} from '../../../components/icons.jsx';
 import { getErrorMessage } from '../../../services/api.js';
 import { formatDateTime, initials } from '../../../utils/format.js';
-import { getResumen, listEntregas } from '../services/entregas.service.js';
+import { getResumen, listEntregas, vaciarEntregas } from '../services/entregas.service.js';
 
 const PAGE_SIZE = 20;
 
@@ -21,6 +28,90 @@ function rangoRapido(dias) {
 const fmt = (n) => Number(n ?? 0).toLocaleString('es');
 const nombreDe = (u) => u.nombre || u.usuario_nombre || 'Usuario eliminado';
 
+/** Ventana de confirmación para vaciar la tabla: el botón solo se activa al escribir VACIAR. */
+function VaciarModal({ onClose, onDone }) {
+  const [texto, setTexto] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const listo = texto === 'VACIAR';
+
+  async function confirmar(e) {
+    e.preventDefault();
+    if (!listo || saving) return;
+    setSaving(true);
+    setError('');
+    try {
+      const { eliminadas } = await vaciarEntregas();
+      onDone(eliminadas);
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se pudo vaciar la tabla'));
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="rmodal-overlay">
+      <form
+        className="rmodal vaciar"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Vaciar entregas"
+        onSubmit={confirmar}
+      >
+        <header className="rmodal-head vaciar-head">
+          <div>
+            <strong>Vaciar todas las entregas</strong>
+            <span>Esta acción no se puede deshacer</span>
+          </div>
+          <button
+            type="button"
+            className="rmodal-close"
+            onClick={onClose}
+            aria-label="Cerrar"
+            disabled={saving}
+          >
+            ✕
+          </button>
+        </header>
+
+        <div className="rmodal-body vaciar-body">
+          <div className="vaciar-warn">
+            <IconAlert width={22} height={22} />
+            <p>
+              Se borrarán <b>todas</b> las entregas registradas: todos los beneficiarios volverán a quedar
+              como <b>pendientes</b> y se perderá quién entregó y cuándo. La Bitácora guardará que lo hiciste.
+            </p>
+          </div>
+
+          <label htmlFor="vaciar-confirm">
+            Para confirmar escribe <b>VACIAR</b>
+          </label>
+          <input
+            id="vaciar-confirm"
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            autoComplete="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            placeholder="VACIAR"
+            autoFocus
+          />
+          {error && <div className="alert error">{error}</div>}
+        </div>
+
+        <footer className="rmodal-foot vaciar-foot">
+          <button type="button" className="btn-outline" onClick={onClose} disabled={saving}>
+            Cancelar
+          </button>
+          <button type="submit" className="btn-danger" disabled={!listo || saving}>
+            {saving ? 'Vaciando…' : 'Vaciar entregas'}
+          </button>
+        </footer>
+      </form>
+    </div>
+  );
+}
+
 export default function EntregasPage() {
   const [resumen, setResumen] = useState(null);
   const [data, setData] = useState({ items: [], total: 0 });
@@ -34,6 +125,8 @@ export default function EntregasPage() {
   const [verFechas, setVerFechas] = useState(false);
   const [dni, setDni] = useState('');
   const [page, setPage] = useState(1);
+  const [vaciando, setVaciando] = useState(false);
+  const [aviso, setAviso] = useState('');
 
   const hoy = rangoRapido(1);
   const semana = rangoRapido(7);
@@ -46,6 +139,14 @@ export default function EntregasPage() {
   function aplicarRango(rango) {
     setDesde(rango?.desde || '');
     setHasta(rango?.hasta || '');
+  }
+
+  function vaciado(eliminadas) {
+    const plural = eliminadas === 1 ? '' : 's';
+    setVaciando(false);
+    setAviso(`Se vació la tabla: ${fmt(eliminadas)} entrega${plural} eliminada${plural}.`);
+    setPage(1);
+    setRecarga((n) => n + 1);
   }
 
   function limpiar() {
@@ -94,16 +195,27 @@ export default function EntregasPage() {
         title="Entregas"
         description="Entregas registradas por cada usuario, con fecha y hora."
         actions={
-          <button
-            type="button"
-            className="btn-outline"
-            onClick={() => setRecarga((n) => n + 1)}
-            disabled={loading}
-          >
-            {loading ? 'Actualizando…' : 'Actualizar'}
-          </button>
+          <div className="ent-actions">
+            <button
+              type="button"
+              className="btn-outline"
+              onClick={() => setRecarga((n) => n + 1)}
+              disabled={loading}
+            >
+              {loading ? 'Actualizando…' : 'Actualizar'}
+            </button>
+            <button type="button" className="btn-outline ent-danger" onClick={() => setVaciando(true)}>
+              <IconTrash width={16} height={16} /> Vaciar entregas
+            </button>
+          </div>
         }
       />
+
+      {aviso && (
+        <div className="alert success" style={{ marginBottom: 16 }}>
+          {aviso}
+        </div>
+      )}
 
       {error && (
         <div className="alert error" style={{ marginBottom: 16 }}>
@@ -165,10 +277,18 @@ export default function EntregasPage() {
         </div>
 
         <div className="audit-pills">
-          <button type="button" className={`audit-pill ${esTodo ? 'active' : ''}`} onClick={() => aplicarRango(null)}>
+          <button
+            type="button"
+            className={`audit-pill ${esTodo ? 'active' : ''}`}
+            onClick={() => aplicarRango(null)}
+          >
             Todo
           </button>
-          <button type="button" className={`audit-pill ${esHoy ? 'active' : ''}`} onClick={() => aplicarRango(hoy)}>
+          <button
+            type="button"
+            className={`audit-pill ${esHoy ? 'active' : ''}`}
+            onClick={() => aplicarRango(hoy)}
+          >
             Hoy
           </button>
           <button
@@ -202,11 +322,21 @@ export default function EntregasPage() {
           <div className="audit-dates">
             <label>
               <span>Desde</span>
-              <input type="date" value={desde} max={hasta || undefined} onChange={(e) => setDesde(e.target.value)} />
+              <input
+                type="date"
+                value={desde}
+                max={hasta || undefined}
+                onChange={(e) => setDesde(e.target.value)}
+              />
             </label>
             <label>
               <span>Hasta</span>
-              <input type="date" value={hasta} min={desde || undefined} onChange={(e) => setHasta(e.target.value)} />
+              <input
+                type="date"
+                value={hasta}
+                min={desde || undefined}
+                onChange={(e) => setHasta(e.target.value)}
+              />
             </label>
           </div>
         )}
@@ -251,7 +381,8 @@ export default function EntregasPage() {
                 <div className="ent-row-main">
                   <strong className="ent-dni">{e.identificador}</strong>
                   <small>
-                    {e.num != null ? `N.º ${e.num}` : 'N.º —'} · {e.grupo != null ? `Grupo ${e.grupo}` : 'Sin grupo'}
+                    {e.num != null ? `N.º ${e.num}` : 'N.º —'} ·{' '}
+                    {e.grupo != null ? `Grupo ${e.grupo}` : 'Sin grupo'}
                   </small>
                 </div>
                 <div className="ent-row-meta">
@@ -269,6 +400,8 @@ export default function EntregasPage() {
           <Pagination page={page} pageSize={PAGE_SIZE} total={data.total} onPageChange={setPage} />
         </>
       )}
+
+      {vaciando && <VaciarModal onClose={() => setVaciando(false)} onDone={vaciado} />}
     </div>
   );
 }

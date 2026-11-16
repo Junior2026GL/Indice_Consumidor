@@ -3640,3 +3640,22 @@ tbody tr:last-child td { border-bottom: 0; }
   .ent-row-main { flex-basis: calc(100% - 52px); }
   .ent-row-meta { flex-basis: 100%; justify-items: start; text-align: left; grid-auto-flow: column; gap: 14px; padding-top: 8px; border-top: 1px dashed var(--color-border); }
 }
+
+/* Entregas: vaciar la tabla */
+.alert.success { background: #ecfdf3; color: #146c43; border-color: #b7ebcb; }
+.ent-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.ent-danger { color: #b42318; border-color: #f3c3be; }
+.ent-danger:hover { background: #fef3f2; border-color: #e5857c; }
+.rmodal.vaciar { max-width: 460px; }
+.vaciar-head { background: linear-gradient(135deg, #b42318, #d92d20); }
+.vaciar-body { background: #fff; gap: 10px; }
+.vaciar-warn { display: flex; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #fef3f2; border: 1px solid #f3c3be; color: #7a271a; }
+.vaciar-warn svg { flex: 0 0 auto; color: #d92d20; margin-top: 2px; }
+.vaciar-warn p { margin: 0; font-size: 14px; line-height: 1.45; }
+.vaciar-body label { font-size: 14px; margin-top: 6px; }
+.vaciar-body input { text-transform: uppercase; letter-spacing: 2px; font-weight: 700; min-height: 50px; font-size: 16px; }
+.vaciar-foot { display: flex; gap: 10px; justify-content: flex-end; }
+.vaciar-foot button { min-height: 46px; }
+.btn-danger { padding: 0 18px; border: 0; border-radius: 12px; background: #d92d20; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.btn-danger:hover:not(:disabled) { background: #b42318; }
+.btn-danger:disabled { opacity: 0.45; cursor: not-allowed; }

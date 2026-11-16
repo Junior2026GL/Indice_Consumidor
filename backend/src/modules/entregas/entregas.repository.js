@@ -64,3 +64,21 @@ export async function listEntregas({ usuarioId, desde, hasta, q, page, pageSize 
 
   return { items: rows, total: Number(total) };
 }
+
+export async function countEntregas() {
+  const [[{ total }]] = await db.query('SELECT COUNT(*) AS total FROM entregas');
+  return Number(total);
+}
+
+/**
+ * Deja la tabla vacía. TRUNCATE es lo más rápido y reinicia el contador de ids, pero exige el permiso
+ * DROP; si el usuario de la base no lo tiene se usa DELETE, que logra el mismo resultado.
+ */
+export async function vaciarEntregas() {
+  try {
+    await db.query('TRUNCATE TABLE entregas');
+  } catch (error) {
+    if (error.code !== 'ER_TABLEACCESS_DENIED_ERROR') throw error;
+    await db.query('DELETE FROM entregas');
+  }
+}

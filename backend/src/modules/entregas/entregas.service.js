@@ -1,4 +1,5 @@
 import * as repository from './entregas.repository.js';
+import { invalidateDashboardCache } from '../dashboard/dashboard.service.js';
 
 export async function resumen({ desde, hasta }) {
   const usuarios = (await repository.resumenPorUsuario({ desde, hasta })).map((row) => ({
@@ -15,4 +16,12 @@ export async function resumen({ desde, hasta }) {
 
 export function list(query) {
   return repository.listEntregas(query);
+}
+
+/** Borra TODAS las entregas (todos los beneficiarios vuelven a pendiente). Devuelve cuántas había. */
+export async function vaciar() {
+  const eliminadas = await repository.countEntregas();
+  await repository.vaciarEntregas();
+  invalidateDashboardCache();
+  return { eliminadas };
 }

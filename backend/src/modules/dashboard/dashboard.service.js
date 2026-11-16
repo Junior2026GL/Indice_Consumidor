@@ -4,6 +4,11 @@ import * as repository from './dashboard.repository.js';
 const CACHE_MS = 60_000;
 let cache = null;
 
+/** Descarta las cifras guardadas (p. ej. tras vaciar las entregas) para que el panel no muestre datos viejos. */
+export function invalidateDashboardCache() {
+  cache = null;
+}
+
 /**
  * Cifras del dashboard. Recorren toda la tabla, así que se guardan 60 segundos
  * en memoria: varias personas abriendo el panel no multiplican las consultas.
