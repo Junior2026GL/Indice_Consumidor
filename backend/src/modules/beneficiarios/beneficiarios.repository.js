@@ -21,7 +21,7 @@ export async function existsByDni(dni) {
 /** Entrega registrada para ese DNI (con el nombre de quien la marcó), o null. */
 export async function findEntrega(dni) {
   const [rows] = await db.query(
-    `SELECT e.entregado_at, u.nombre AS entregado_por
+    `SELECT e.entregado_at, e.usuario_id, u.nombre AS entregado_por
      FROM entregas e
      LEFT JOIN usuarios u ON u.id = e.usuario_id
      WHERE e.identificador = ?
@@ -36,7 +36,10 @@ export async function insertEntrega(dni, userId) {
   await db.query('INSERT INTO entregas (identificador, usuario_id) VALUES (?, ?)', [dni, userId]);
 }
 
-export async function deleteEntrega(dni) {
-  const [result] = await db.query('DELETE FROM entregas WHERE identificador = ?', [dni]);
+/** Con userId solo borra la entrega que registró ese usuario (en una sola consulta: sin carreras). */
+export async function deleteEntrega(dni, userId) {
+  const [result] = userId
+    ? await db.query('DELETE FROM entregas WHERE identificador = ? AND usuario_id = ?', [dni, userId])
+    : await db.query('DELETE FROM entregas WHERE identificador = ?', [dni]);
   return result.affectedRows;
 }

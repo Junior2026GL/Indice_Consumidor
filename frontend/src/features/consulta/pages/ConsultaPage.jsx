@@ -179,7 +179,7 @@ function EntregaBlock({ dni, entrega, canUndo, onChanged }) {
   );
 }
 
-function ResultCard({ item, isSuperAdmin, onChanged }) {
+function ResultCard({ item, onChanged }) {
   const [copied, setCopied] = useState(false);
   const cuenta = String(item.cuenta_occidente ?? '').trim();
 
@@ -247,7 +247,7 @@ function ResultCard({ item, isSuperAdmin, onChanged }) {
       <EntregaBlock
         dni={item.identificador}
         entrega={item.entrega}
-        canUndo={isSuperAdmin}
+        canUndo={Boolean(item.entrega?.puede_anular)}
         onChanged={onChanged}
       />
     </article>
@@ -455,7 +455,6 @@ export default function ConsultaPage() {
               <span>{error}</span>
             </div>
           )}
-
         </div>
 
         <footer className="consulta-footer">© {new Date().getFullYear()} IPC INSEP</footer>
@@ -473,12 +472,7 @@ export default function ConsultaPage() {
             </div>
           ) : (
             result.items.map((item, index) => (
-              <ResultCard
-                key={`${item.num}-${index}`}
-                item={item}
-                isSuperAdmin={user?.rol === 'SUPER_ADMIN'}
-                onChanged={refresh}
-              />
+              <ResultCard key={`${item.num}-${index}`} item={item} onChanged={refresh} />
             ))
           )}
         </ResultModal>

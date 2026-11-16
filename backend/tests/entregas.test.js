@@ -21,8 +21,22 @@ function mockDb(session) {
     if (sql.includes('GROUP BY e.usuario_id')) {
       return [
         [
-          { usuario_id: 2, nombre: 'Ana', usuario: 'ana', total: '3', primera: '2026-11-15 08:00:00', ultima: '2026-11-15 10:00:00' },
-          { usuario_id: 3, nombre: 'Luis', usuario: 'luis', total: '1', primera: '2026-11-15 09:00:00', ultima: '2026-11-15 09:00:00' },
+          {
+            usuario_id: 2,
+            nombre: 'Ana',
+            usuario: 'ana',
+            total: '3',
+            primera: '2026-11-15 08:00:00',
+            ultima: '2026-11-15 10:00:00',
+          },
+          {
+            usuario_id: 3,
+            nombre: 'Luis',
+            usuario: 'luis',
+            total: '1',
+            primera: '2026-11-15 09:00:00',
+            ultima: '2026-11-15 09:00:00',
+          },
         ],
         undefined,
       ];
@@ -30,7 +44,17 @@ function mockDb(session) {
     if (sql.includes('COUNT(*) AS total FROM entregas')) return [[{ total: '2' }], undefined];
     if (sql.includes('ORDER BY e.entregado_at DESC')) {
       return [
-        [{ id: 9, identificador: '0801199012345', usuario_id: 2, usuario_nombre: 'Ana', entregado_at: '2026-11-15 10:00:00', num: 7, grupo: 3 }],
+        [
+          {
+            id: 9,
+            identificador: '0801199012345',
+            usuario_id: 2,
+            usuario_nombre: 'Ana',
+            entregado_at: '2026-11-15 10:00:00',
+            num: 7,
+            grupo: 3,
+          },
+        ],
         undefined,
       ];
     }
@@ -77,7 +101,11 @@ describe('/api/entregas', () => {
 
   it('rechaza fechas y DNI inválidos', async () => {
     mockDb(SUPER);
-    expect((await request(app).get('/api/entregas?desde=ayer').set('Authorization', bearer(SUPER))).status).toBe(400);
-    expect((await request(app).get('/api/entregas?q=abc').set('Authorization', bearer(SUPER))).status).toBe(400);
+    expect(
+      (await request(app).get('/api/entregas?desde=ayer').set('Authorization', bearer(SUPER))).status
+    ).toBe(400);
+    expect((await request(app).get('/api/entregas?q=abc').set('Authorization', bearer(SUPER))).status).toBe(
+      400
+    );
   });
 });
