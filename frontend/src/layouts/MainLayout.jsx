@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { IconDashboard, IconUsers, IconLogbook, IconSearch, IconDelivery } from '../components/icons.jsx';
 import { useAuth } from '../features/auth/AuthContext.jsx';
 import UserMenu from './UserMenu.jsx';
+import TwoFactorBanner from '../features/auth/components/TwoFactorBanner.jsx';
 
 const menu = [
   ['/dashboard', 'Dashboard', IconDashboard],
@@ -49,6 +50,7 @@ export default function MainLayout() {
         </header>
 
         <main className="content">
+          <TwoFactorBanner />
           <Outlet />
         </main>
 

@@ -29,6 +29,8 @@ const schema = z.object({
   DB_POOL_SIZE: z.coerce.number().int().min(1).max(200).default(10),
 
   JWT_SECRET: z.string().optional(),
+  // Clave para cifrar los secretos de la verificación en dos pasos. Si no se define se usa JWT_SECRET.
+  TOTP_ENCRYPTION_KEY: z.string().min(32, 'TOTP_ENCRYPTION_KEY debe tener al menos 32 caracteres').optional(),
   // Duración corta del token de acceso; la sesión se renueva con el refresh token.
   JWT_EXPIRES_IN_SECONDS: z.coerce.number().int().min(60).max(3600).default(900),
   REFRESH_TOKEN_DAYS: z.coerce.number().int().min(1).max(90).default(7),
@@ -111,6 +113,7 @@ export const env = Object.freeze({
 
   auth: Object.freeze({
     jwtSecret,
+    totpEncryptionKey: raw.TOTP_ENCRYPTION_KEY || jwtSecret,
     jwtIssuer: 'ipc-insep-api',
     jwtAudience: 'ipc-insep-web',
     accessTokenSeconds: raw.JWT_EXPIRES_IN_SECONDS,

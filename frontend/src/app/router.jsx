@@ -4,6 +4,7 @@ import MainLayout from '../layouts/MainLayout.jsx';
 import PageLoader from '../components/PageLoader.jsx';
 import RouteError from '../components/RouteError.jsx';
 import { AuthProvider, useAuth } from '../features/auth/AuthContext.jsx';
+import IdleGuard from '../features/auth/IdleGuard.jsx';
 
 // Cada página se descarga solo cuando se visita (carga inicial más liviana).
 const ConsultaPage = lazy(() => import('../features/consulta/pages/ConsultaPage.jsx'));
@@ -32,7 +33,12 @@ function Protected({ children, roles }) {
   if (status !== 'authenticated') return <Navigate to="/login" replace />;
   if (roles && !roles.includes(user.rol)) return <Navigate to="/" replace />;
 
-  return children;
+  return (
+    <>
+      <IdleGuard />
+      {children}
+    </>
+  );
 }
 
 export const router = createBrowserRouter([

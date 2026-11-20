@@ -53,6 +53,8 @@ const accionLabels = {
   ACTIVAR: 'Activación',
   DESACTIVAR: 'Desactivación',
   RESET_PASSWORD: 'Restablecer contraseña',
+  ACTIVAR_2FA: '2FA activada',
+  DESACTIVAR_2FA: '2FA desactivada',
 };
 
 const accionTones = {
@@ -69,6 +71,8 @@ const accionTones = {
   ACTIVAR: 'green',
   DESACTIVAR: 'red',
   RESET_PASSWORD: 'purple',
+  ACTIVAR_2FA: 'green',
+  DESACTIVAR_2FA: 'red',
 };
 
 const accionIcons = {
@@ -85,10 +89,18 @@ const accionIcons = {
   ACTIVAR: IconPower,
   DESACTIVAR: IconPower,
   RESET_PASSWORD: IconLock,
+  ACTIVAR_2FA: IconShield,
+  DESACTIVAR_2FA: IconShield,
 };
 
 // Debe coincidir con ACCIONES_ALERTA del backend (audit.repository.js).
-const ACCIONES_ALERTA = new Set(['LOGIN_FALLIDO', 'ANULAR_ENTREGA', 'VACIAR_ENTREGAS', 'DESACTIVAR']);
+const ACCIONES_ALERTA = new Set([
+  'LOGIN_FALLIDO',
+  'ANULAR_ENTREGA',
+  'VACIAR_ENTREGAS',
+  'DESACTIVAR',
+  'DESACTIVAR_2FA',
+]);
 
 function initials(name) {
   if (!name) return '?';

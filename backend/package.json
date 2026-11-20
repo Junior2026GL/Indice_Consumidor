@@ -13,6 +13,7 @@
     "db:seed": "node scripts/db.js seed",
     "db:status": "node scripts/db.js status",
     "create-admin": "node scripts/create-admin.js",
+    "reset-2fa": "node scripts/reset-2fa.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -33,6 +34,7 @@
     "mysql2": "^3.11.4",
     "pino": "^9.5.0",
     "pino-http": "^10.3.0",
+    "qrcode": "^1.5.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {

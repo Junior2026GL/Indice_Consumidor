@@ -59,6 +59,8 @@ La contraseña inicial **no** está en el repositorio: se pasa por la variable `
 - **HTTP**: Helmet con CSP restrictiva, HSTS en producción, CORS por lista blanca, `Cache-Control: no-store`, límite de cuerpo 100 KB, defensa CSRF (cookie `SameSite` + cabecera `X-Requested-With` obligatoria en refresh/logout).
 - **Errores y logs**: los errores 5xx nunca exponen detalles; logs JSON con `pino` y `X-Request-Id`; se redactan contraseñas, tokens y cookies.
 - **Secretos**: `JWT_SECRET` obligatorio (≥ 32 caracteres) en producción; el arranque falla con valores débiles o de ejemplo.
+- **Cierre por inactividad**: la sesión se cierra tras 10 minutos sin actividad, con aviso y cuenta regresiva el último minuto (`frontend/src/features/auth/idle.js`).
+- **Verificación en dos pasos (TOTP)** para el Super Admin: se activa desde el menú del usuario. El secreto se guarda cifrado (AES-256-GCM, clave `TOTP_ENCRYPTION_KEY` o, si falta, `JWT_SECRET`), cada código solo sirve una vez, un código erróneo cuenta como intento fallido (bloqueo de cuenta) y hay 8 códigos de respaldo de un solo uso. Requiere la migración `006_two_factor.sql`. Si el Super Admin pierde el celular **y** los códigos: `npm run reset-2fa -- <usuario>` (hay que tener acceso al servidor).
 
 ## Despliegue
 

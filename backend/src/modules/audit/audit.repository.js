@@ -10,7 +10,13 @@ export async function logAudit({ userId, accion, modulo, descripcion, ip }) {
 }
 
 // Acciones que merecen revisión: intentos fallidos de acceso y cuentas desactivadas.
-export const ACCIONES_ALERTA = ['LOGIN_FALLIDO', 'ANULAR_ENTREGA', 'VACIAR_ENTREGAS', 'DESACTIVAR'];
+export const ACCIONES_ALERTA = [
+  'LOGIN_FALLIDO',
+  'ANULAR_ENTREGA',
+  'VACIAR_ENTREGAS',
+  'DESACTIVAR',
+  'DESACTIVAR_2FA',
+];
 const alertasPlaceholders = ACCIONES_ALERTA.map(() => '?').join(', ');
 
 /**

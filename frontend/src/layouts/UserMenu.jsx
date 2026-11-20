@@ -4,6 +4,7 @@ import { PasswordField, PasswordStrengthMeter } from '../components/PasswordFiel
 import { useToast } from '../components/ToastProvider.jsx';
 import { IconKey, IconLogout, IconChevronDown, IconShield } from '../components/icons.jsx';
 import { useAuth } from '../features/auth/AuthContext.jsx';
+import TwoFactorModal from '../features/auth/components/TwoFactorModal.jsx';
 import { getErrorMessage } from '../services/api.js';
 import { isValidPassword, PASSWORD_HINT } from '../utils/password.js';
 import { initials } from '../utils/format.js';
@@ -146,6 +147,7 @@ export default function UserMenu({ user }) {
   const { logout: closeSession } = useAuth();
   const [open, setOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showTwoFactor, setShowTwoFactor] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -206,6 +208,23 @@ export default function UserMenu({ user }) {
             Cambiar contraseña
           </button>
 
+          {user?.rol === 'SUPER_ADMIN' && (
+            <button
+              onClick={() => {
+                setShowTwoFactor(true);
+                setOpen(false);
+              }}
+            >
+              <span className="user-menu-item-icon green">
+                <IconShield width={15} height={15} />
+              </span>
+              <span className="user-menu-item-text">
+                Verificación en dos pasos
+                <small>{user.two_factor ? 'Activa' : 'Desactivada'}</small>
+              </span>
+            </button>
+          )}
+
           <div className="user-menu-divider" />
 
           <button className="danger" onClick={logout}>
@@ -218,6 +237,7 @@ export default function UserMenu({ user }) {
       )}
 
       {showPassword && <ChangePasswordModal onClose={() => setShowPassword(false)} />}
+      {showTwoFactor && <TwoFactorModal onClose={() => setShowTwoFactor(false)} />}
     </div>
   );
 }

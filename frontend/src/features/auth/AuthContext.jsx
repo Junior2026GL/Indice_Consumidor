@@ -26,10 +26,24 @@ export function AuthProvider({ children }) {
     return () => setSessionExpiredHandler(() => {});
   }, []);
 
+  // Devuelve { requires2fa, challengeToken } si falta el código; si no, abre la sesión.
   const login = useCallback(async (credentials) => {
-    const user = await authService.login(credentials);
+    const result = await authService.login(credentials);
+    if (result.requires2fa) return result;
+    setState({ status: 'authenticated', user: result });
+    return result;
+  }, []);
+
+  const loginWithCode = useCallback(async (payload) => {
+    const user = await authService.loginWithCode(payload);
     setState({ status: 'authenticated', user });
     return user;
+  }, []);
+
+  // Vuelve a pedir los datos del usuario (p. ej. tras activar o desactivar el 2FA).
+  const reloadUser = useCallback(async () => {
+    const user = await authService.getMe();
+    setState({ status: 'authenticated', user });
   }, []);
 
   const logout = useCallback(() => {
@@ -43,8 +57,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ ...state, login, logout, changePassword }),
-    [state, login, logout, changePassword]
+    () => ({ ...state, login, loginWithCode, logout, changePassword, reloadUser }),
+    [state, login, loginWithCode, logout, changePassword, reloadUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

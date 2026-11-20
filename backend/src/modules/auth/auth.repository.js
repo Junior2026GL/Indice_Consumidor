@@ -1,8 +1,8 @@
-import { db } from '../../infrastructure/database/mysql.js';
+import { db, withTransaction } from '../../infrastructure/database/mysql.js';
 
 export async function findUserByUsername(usuario) {
   const [rows] = await db.query(
-    `SELECT u.id, u.nombre, u.usuario, u.password_hash, u.activo, r.nombre AS rol,
+    `SELECT u.id, u.nombre, u.usuario, u.password_hash, u.activo, u.totp_enabled, r.nombre AS rol,
             (u.bloqueado_hasta IS NOT NULL AND u.bloqueado_hasta > NOW()) AS bloqueado,
             GREATEST(1, CEIL(TIMESTAMPDIFF(SECOND, NOW(), u.bloqueado_hasta) / 60)) AS minutos_bloqueo
      FROM usuarios u
@@ -17,7 +17,7 @@ export async function findUserByUsername(usuario) {
 /** Usuario activo con su rol vigente. Lo usa el middleware de autenticación en cada request. */
 export async function findActiveUserById(id) {
   const [rows] = await db.query(
-    `SELECT u.id, u.nombre, u.usuario, r.nombre AS rol
+    `SELECT u.id, u.nombre, u.usuario, u.totp_enabled, r.nombre AS rol
      FROM usuarios u
      LEFT JOIN roles r ON r.id = u.rol_id
      WHERE u.id = ? AND u.activo = 1
@@ -29,7 +29,7 @@ export async function findActiveUserById(id) {
 
 export async function findUserById(id) {
   const [rows] = await db.query(
-    `SELECT u.id, u.nombre, u.usuario, u.email, u.activo, r.nombre AS rol
+    `SELECT u.id, u.nombre, u.usuario, u.email, u.activo, u.totp_enabled, r.nombre AS rol
      FROM usuarios u
      LEFT JOIN roles r ON r.id = u.rol_id
      WHERE u.id = ?
@@ -69,6 +69,69 @@ export async function findPasswordHashById(id) {
 
 export async function updatePasswordById(id, passwordHash) {
   await db.query('UPDATE usuarios SET password_hash = ? WHERE id = ?', [passwordHash, id]);
+}
+
+/* ------------------------ Verificación en dos pasos ------------------------ */
+
+/** Estado 2FA de un usuario activo, con datos de bloqueo (el paso 2 del login también cuenta intentos). */
+export async function findTwoFactorState(id) {
+  const [rows] = await db.query(
+    `SELECT u.id, u.nombre, u.usuario, u.totp_secret, u.totp_enabled, u.totp_last_step, r.nombre AS rol,
+            (u.bloqueado_hasta IS NOT NULL AND u.bloqueado_hasta > NOW()) AS bloqueado,
+            GREATEST(1, CEIL(TIMESTAMPDIFF(SECOND, NOW(), u.bloqueado_hasta) / 60)) AS minutos_bloqueo
+     FROM usuarios u
+     LEFT JOIN roles r ON r.id = u.rol_id
+     WHERE u.id = ? AND u.activo = 1
+     LIMIT 1`,
+    [id]
+  );
+  return rows[0] || null;
+}
+
+export async function savePendingTotpSecret(id, encryptedSecret) {
+  await db.query(
+    'UPDATE usuarios SET totp_secret = ?, totp_enabled = 0, totp_last_step = NULL WHERE id = ? AND totp_enabled = 0',
+    [encryptedSecret, id]
+  );
+}
+
+/** Marca un intervalo como usado. Devuelve false si ya se había usado (código repetido). */
+export async function claimTotpStep(id, step) {
+  const [result] = await db.query(
+    'UPDATE usuarios SET totp_last_step = ? WHERE id = ? AND (totp_last_step IS NULL OR totp_last_step < ?)',
+    [step, id, step]
+  );
+  return result.affectedRows === 1;
+}
+
+/** Activa el 2FA y guarda los códigos de respaldo en una sola transacción. */
+export function enableTotp(id, backupHashes) {
+  return withTransaction(async (conn) => {
+    await conn.query('UPDATE usuarios SET totp_enabled = 1 WHERE id = ?', [id]);
+    await conn.query('DELETE FROM usuario_backup_codes WHERE usuario_id = ?', [id]);
+    await conn.query('INSERT INTO usuario_backup_codes (usuario_id, code_hash) VALUES ?', [
+      backupHashes.map((hash) => [id, hash]),
+    ]);
+  });
+}
+
+export function disableTotp(id) {
+  return withTransaction(async (conn) => {
+    await conn.query(
+      'UPDATE usuarios SET totp_enabled = 0, totp_secret = NULL, totp_last_step = NULL WHERE id = ?',
+      [id]
+    );
+    await conn.query('DELETE FROM usuario_backup_codes WHERE usuario_id = ?', [id]);
+  });
+}
+
+/** Gasta un código de respaldo. Devuelve true solo si existía y no se había usado. */
+export async function consumeBackupCode(userId, codeHash) {
+  const [result] = await db.query(
+    'UPDATE usuario_backup_codes SET used_at = NOW() WHERE usuario_id = ? AND code_hash = ? AND used_at IS NULL',
+    [userId, codeHash]
+  );
+  return result.affectedRows === 1;
 }
 
 /* ---------------------------- Refresh tokens ---------------------------- */

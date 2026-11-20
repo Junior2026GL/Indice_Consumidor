@@ -159,7 +159,13 @@ describe('login', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data.token).toBeTruthy();
-    expect(res.body.data.user).toEqual({ id: 1, nombre: 'Super', usuario: 'super', rol: 'SUPER_ADMIN' });
+    expect(res.body.data.user).toEqual({
+      id: 1,
+      nombre: 'Super',
+      usuario: 'super',
+      rol: 'SUPER_ADMIN',
+      two_factor: false,
+    });
     expect(JSON.stringify(res.body)).not.toContain('password');
 
     const cookie = res.headers['set-cookie'].find((c) => c.startsWith('ipc_refresh='));

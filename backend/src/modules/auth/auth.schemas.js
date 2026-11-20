@@ -14,6 +14,28 @@ export const loginSchema = z.object({
     .max(200, 'Usuario o contraseña incorrectos'),
 });
 
+const codeField = z
+  .string({ required_error: 'El código es obligatorio' })
+  .trim()
+  .min(6, 'Código incorrecto')
+  .max(20, 'Código incorrecto');
+
+export const login2faSchema = z.object({
+  challengeToken: z.string({ required_error: 'Sesión de verificación inválida' }).min(1).max(2000),
+  code: codeField,
+});
+
+export const twoFactorSetupSchema = z.object({
+  password: z.string({ required_error: 'La contraseña es obligatoria' }).min(1).max(200),
+});
+
+export const twoFactorEnableSchema = z.object({ code: codeField });
+
+export const twoFactorDisableSchema = z.object({
+  password: z.string({ required_error: 'La contraseña es obligatoria' }).min(1).max(200),
+  code: codeField,
+});
+
 export const changePasswordSchema = z.object({
   currentPassword: z.string({ required_error: 'La contraseña actual es obligatoria' }).min(1).max(200),
   newPassword: passwordSchema,
