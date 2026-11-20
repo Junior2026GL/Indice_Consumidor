@@ -12,6 +12,7 @@ import {
 } from '../services/beneficiarios.service.js';
 
 const DNI_LENGTH = 13;
+const NAME_MIN = 3;
 
 const MODES = [
   {
@@ -411,24 +412,42 @@ export default function ConsultaPage() {
   const { user, logout } = useAuth();
   const inputRef = useRef(null);
   const [mode, setMode] = useState(null); // null = menú de opciones;
+  const [by, setBy] = useState('dni'); // solo en Indemnización: 'dni' | 'nombre'
   const [dni, setDni] = useState('');
   const [result, setResult] = useState(null); // null = aún no se busca
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const ready = dni.length === DNI_LENGTH;
   const isIndem = mode === 'indemnizacion';
+  const byName = isIndem && by === 'nombre';
+  const ready = byName ? dni.trim().length >= NAME_MIN : dni.length === DNI_LENGTH;
   const current = MODES.find((m) => m.id === mode);
-  const consultar = isIndem ? buscarIndemnizacion : buscarPorDni;
+  const consultar = (valor) =>
+    isIndem ? buscarIndemnizacion(byName ? { nombre: valor.trim() } : { dni: valor }) : buscarPorDni(valor);
 
   function changeMode(next) {
     setMode(next);
+    setBy('dni');
     setDni('');
     setResult(null);
     setError('');
   }
 
+  function changeBy(next) {
+    setBy(next);
+    setDni('');
+    setResult(null);
+    setError('');
+    setTimeout(() => inputRef.current?.focus(), 0);
+  }
+
   function handleChange(e) {
+    if (byName) {
+      setDni(e.target.value.slice(0, 100));
+      setResult(null);
+      setError('');
+      return;
+    }
     // Solo dígitos (también al pegar texto con guiones o espacios), máximo 13.
     setDni(e.target.value.replace(/\D/g, '').slice(0, DNI_LENGTH));
     setResult(null);
@@ -573,36 +592,64 @@ export default function ConsultaPage() {
 
         {mode && (
           <form className="consulta-card" onSubmit={submit}>
-            <label htmlFor="dni">Número de DNI</label>
+            {isIndem && (
+              <div className="consulta-by" role="tablist" aria-label="Buscar por">
+                {[
+                  ['dni', 'Por DNI'],
+                  ['nombre', 'Por nombre'],
+                ].map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={by === id}
+                    className={by === id ? 'active' : ''}
+                    onClick={() => changeBy(id)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+            <label htmlFor="dni">{byName ? 'Nombre del beneficiario' : 'Número de DNI'}</label>
             <input
+              key={by}
               id="dni"
               ref={inputRef}
-              className="consulta-input"
+              className={`consulta-input ${byName ? 'consulta-input-name' : ''}`}
               type="text"
-              inputMode="numeric"
-              pattern="\d{13}"
-              maxLength={DNI_LENGTH}
+              inputMode={byName ? 'text' : 'numeric'}
+              pattern={byName ? undefined : String.raw`\d{13}`}
+              maxLength={byName ? 100 : DNI_LENGTH}
               autoComplete="off"
               autoCorrect="off"
               spellCheck={false}
               autoFocus
-              placeholder="0000000000000"
+              placeholder={byName ? 'Ej. Juan López' : '0000000000000'}
               value={dni}
               onChange={handleChange}
               aria-describedby="dni-ayuda"
             />
-            <div className="consulta-progress" aria-hidden="true">
-              <span
-                style={{ width: `${(dni.length / DNI_LENGTH) * 100}%` }}
-                className={ready ? 'full' : ''}
-              />
-            </div>
-            <div className="consulta-meta" id="dni-ayuda">
-              <span>Ingresa los 13 dígitos, sin guiones</span>
-              <span className={ready ? 'ok' : ''}>
-                {dni.length}/{DNI_LENGTH}
-              </span>
-            </div>
+            {byName ? (
+              <div className="consulta-meta" id="dni-ayuda">
+                <span>Escribe al menos {NAME_MIN} letras (nombre, apellido o ambos)</span>
+              </div>
+            ) : (
+              <>
+                <div className="consulta-progress" aria-hidden="true">
+                  <span
+                    style={{ width: `${(dni.length / DNI_LENGTH) * 100}%` }}
+                    className={ready ? 'full' : ''}
+                  />
+                </div>
+                <div className="consulta-meta" id="dni-ayuda">
+                  <span>Ingresa los 13 dígitos, sin guiones</span>
+                  <span className={ready ? 'ok' : ''}>
+                    {dni.length}/{DNI_LENGTH}
+                  </span>
+                </div>
+              </>
+            )}
 
             <button className="btn-primary consulta-submit" type="submit" disabled={!ready || loading}>
               {loading ? (
@@ -637,12 +684,24 @@ export default function ConsultaPage() {
               <strong>Sin resultados</strong>
               <p>
                 {isIndem
-                  ? `No se encontró indemnización para el DNI ${dni}.`
+                  ? byName
+                    ? `No se encontró indemnización para "${dni.trim()}".`
+                    : `No se encontró indemnización para el DNI ${dni}.`
                   : `No se encontró ningún beneficiario con el DNI ${dni}.`}
               </p>
             </div>
           ) : isIndem ? (
-            <IndemnizacionCard item={result.item} />
+            <>
+              {result.truncado && (
+                <p className="consulta-truncado">
+                  Hay más coincidencias: se muestran las primeras {result.items.length}. Escribe más del
+                  nombre para acotar.
+                </p>
+              )}
+              {result.items.map((item) => (
+                <IndemnizacionCard key={item.identificador} item={item} />
+              ))}
+            </>
           ) : (
             result.items.map((item, index) => (
               <ResultCard key={`${item.num}-${index}`} item={item} onChanged={refresh} />

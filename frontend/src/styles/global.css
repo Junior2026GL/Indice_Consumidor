@@ -3676,3 +3676,10 @@ tbody tr:last-child td { border-bottom: 0; }
 .consulta-menu-text small { font-size: 13px; line-height: 1.35; color: var(--color-muted); }
 .consulta-menu-arrow { flex: none; color: #9aa6bd; }
 .consulta-back { margin-bottom: 12px; padding: 8px 4px; border: 0; background: none; font: inherit; font-weight: 700; font-size: 14px; color: var(--color-primary-dark); cursor: pointer; }
+
+/* Indemnización: buscar por DNI / por nombre */
+.consulta-by { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; margin-bottom: 16px; background: #e8edf6; border-radius: 12px; }
+.consulta-by button { min-height: 40px; border: 0; border-radius: 9px; background: transparent; font: inherit; font-weight: 700; font-size: 14px; color: var(--color-muted); cursor: pointer; }
+.consulta-by button.active { background: #fff; color: var(--color-primary-dark); box-shadow: 0 2px 6px rgba(11, 47, 107, .14); }
+.consulta-input.consulta-input-name { font-size: 18px; letter-spacing: 0; }
+.consulta-truncado { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; background: #fffaeb; border: 1px solid #fbe4a8; font-size: 13px; }

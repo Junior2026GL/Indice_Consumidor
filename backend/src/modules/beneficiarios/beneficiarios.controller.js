@@ -22,12 +22,14 @@ export const buscar = asyncHandler(async (req, res) => {
 });
 
 export const buscarIndemnizacion = asyncHandler(async (req, res) => {
-  const data = await service.buscarIndemnizacion(req.query.dni);
+  const { dni, nombre } = req.query;
+  const data = await service.buscarIndemnizacion({ dni, nombre });
 
+  const criterio = dni ? `del DNI ${masked(dni)}` : `por nombre "${nombre}"`;
   await audit(
     req,
     AUDIT_ACCIONES.CONSULTAR,
-    `Consulta de indemnización del DNI ${masked(req.query.dni)} (${data.encontrado ? 'encontrado' : 'sin resultado'})`
+    `Consulta de indemnización ${criterio} (${data.items.length} resultado(s))`
   );
 
   res.json({ ok: true, data });

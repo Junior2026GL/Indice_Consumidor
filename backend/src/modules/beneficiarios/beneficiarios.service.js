@@ -26,9 +26,15 @@ export async function buscarPorDni(dni, user) {
   };
 }
 
-export async function buscarIndemnizacion(dni) {
-  const item = await repository.findIndemnizacionByDni(dni);
-  return { encontrado: Boolean(item), item };
+/** Siempre devuelve una lista (por DNI tiene 0 o 1 elemento). `truncado`: hay más coincidencias que las mostradas. */
+export async function buscarIndemnizacion({ dni, nombre }) {
+  if (dni) {
+    const item = await repository.findIndemnizacionByDni(dni);
+    return { encontrado: Boolean(item), items: item ? [item] : [], truncado: false };
+  }
+  const rows = await repository.findIndemnizacionByNombre(nombre);
+  const max = repository.MAX_INDEMNIZACION_RESULTS;
+  return { encontrado: rows.length > 0, items: rows.slice(0, max), truncado: rows.length > max };
 }
 
 export async function marcarEntregado(dni, user) {

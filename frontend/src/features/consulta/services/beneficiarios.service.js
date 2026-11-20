@@ -6,9 +6,9 @@ export async function buscarPorDni(dni, { signal } = {}) {
   return data.data;
 }
 
-/** { encontrado, item: { numero, identificador, nombre, indemnizacion } | null } */
-export async function buscarIndemnizacion(dni, { signal } = {}) {
-  const { data } = await api.get('/beneficiarios/indemnizacion', { params: { dni }, signal });
+/** criterio: { dni } o { nombre }. -> { encontrado, truncado, items: [{ numero, identificador, nombre, indemnizacion }] } */
+export async function buscarIndemnizacion(criterio, { signal } = {}) {
+  const { data } = await api.get('/beneficiarios/indemnizacion', { params: criterio, signal });
   return data.data;
 }
 

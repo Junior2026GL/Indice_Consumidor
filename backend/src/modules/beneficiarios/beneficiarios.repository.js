@@ -1,4 +1,7 @@
 import { db } from '../../infrastructure/database/mysql.js';
+import { escapeLike } from '../../shared/utils/sql.js';
+
+export const MAX_INDEMNIZACION_RESULTS = 20;
 
 /** Búsqueda exacta por DNI (13 dígitos, sin guiones); usa el índice de `identificador`. */
 export async function findByDni(dni) {
@@ -9,6 +12,21 @@ export async function findByDni(dni) {
      ORDER BY num
      LIMIT 10`,
     [dni]
+  );
+  return rows;
+}
+
+/** Por nombre: cada palabra debe aparecer (en cualquier orden). Pide uno de más para saber si hay más resultados. */
+export async function findIndemnizacionByNombre(nombre) {
+  const words = nombre.split(/\s+/).filter(Boolean).slice(0, 6);
+  const where = words.map(() => 'nombre LIKE ?').join(' AND ');
+  const [rows] = await db.query(
+    `SELECT numero, identificador, nombre, indemnizacion
+     FROM indemnizacion_ipc_insep
+     WHERE ${where}
+     ORDER BY nombre
+     LIMIT ?`,
+    [...words.map((w) => `%${escapeLike(w)}%`), MAX_INDEMNIZACION_RESULTS + 1]
   );
   return rows;
 }

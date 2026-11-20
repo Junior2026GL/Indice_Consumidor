@@ -2,7 +2,7 @@ import { Router } from 'express';
 import * as controller from './beneficiarios.controller.js';
 import { validate } from '../../shared/middleware/validate.js';
 import { searchLimiter } from '../../shared/middleware/rateLimit.js';
-import { buscarQuery, dniParams, entregaSchema } from './beneficiarios.schemas.js';
+import { buscarQuery, dniParams, entregaSchema, indemnizacionQuery } from './beneficiarios.schemas.js';
 
 const router = Router();
 
@@ -13,7 +13,7 @@ router.get('/buscar', searchLimiter, validate({ query: buscarQuery }), controlle
 router.get(
   '/indemnizacion',
   searchLimiter,
-  validate({ query: buscarQuery }),
+  validate({ query: indemnizacionQuery }),
   controller.buscarIndemnizacion
 );
 router.post('/entrega', searchLimiter, validate({ body: entregaSchema }), controller.entregar);

@@ -235,13 +235,46 @@ describe('GET /api/beneficiarios/indemnizacion', () => {
     });
     const res = await get(DNI);
     expect(res.status).toBe(200);
-    expect(res.body.data).toEqual({ encontrado: true, item: INDEM });
+    expect(res.body.data).toEqual({ encontrado: true, items: [INDEM], truncado: false });
     expect(JSON.stringify(audits())).not.toContain(DNI);
   });
 
   it('sin registro devuelve encontrado: false', async () => {
     const res = await get(DNI);
     expect(res.status).toBe(200);
-    expect(res.body.data).toEqual({ encontrado: false, item: null });
+    expect(res.body.data).toEqual({ encontrado: false, items: [], truncado: false });
+  });
+});
+
+describe('GET /api/beneficiarios/indemnizacion por nombre', () => {
+  const INDEM = { numero: 5, identificador: DNI, nombre: 'Juan López', indemnizacion: '12345.67890000' };
+  const get = (q) => request(app).get('/api/beneficiarios/indemnizacion').query(q).set(as(TUTOR));
+  const mockRows = (rows) =>
+    query.mockImplementation(async (sql) => {
+      if (sql.includes('WHERE u.id = ? AND u.activo = 1')) return [[TUTOR], undefined];
+      if (sql.includes('FROM indemnizacion_ipc_insep')) return [rows, undefined];
+      return [[], undefined];
+    });
+
+  it('rechaza nombres de menos de 3 letras y pedir DNI y nombre a la vez (400)', async () => {
+    expect((await get({ nombre: 'ju' })).status).toBe(400);
+    expect((await get({ nombre: 'juan', dni: DNI })).status).toBe(400);
+    expect((await get({})).status).toBe(400);
+  });
+
+  it('busca cada palabra con LIKE escapado', async () => {
+    mockRows([INDEM]);
+    const res = await get({ nombre: 'juan 50%' });
+    expect(res.status).toBe(200);
+    expect(res.body.data.items).toEqual([INDEM]);
+    const call = query.mock.calls.find(([sql]) => sql.includes('FROM indemnizacion_ipc_insep'));
+    expect(call[1]).toEqual(['%juan%', '%50\\%%', 21]);
+  });
+
+  it('marca truncado cuando hay más de 20 coincidencias', async () => {
+    mockRows(Array.from({ length: 21 }, (_, i) => ({ ...INDEM, identificador: String(i) })));
+    const res = await get({ nombre: 'juan' });
+    expect(res.body.data.items).toHaveLength(20);
+    expect(res.body.data.truncado).toBe(true);
   });
 });
