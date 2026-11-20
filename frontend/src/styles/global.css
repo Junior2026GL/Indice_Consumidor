@@ -3688,3 +3688,9 @@ tbody tr:last-child td { border-bottom: 0; }
 .consulta-by button.active { background: #fff; color: var(--color-primary-dark); box-shadow: 0 2px 6px rgba(11, 47, 107, .14); }
 .consulta-input.consulta-input-name { font-size: 18px; letter-spacing: 0; }
 .consulta-truncado { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; background: #fffaeb; border: 1px solid #fbe4a8; font-size: 13px; }
+
+/* Botón "Instalar App" (login) */
+.install-app { margin-top: 14px; text-align: center; }
+.install-app-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; border: 2px dashed #9db8e8; border-radius: 14px; background: rgba(255, 255, 255, .7); font: inherit; font-weight: 700; font-size: 15px; color: var(--color-primary-dark); cursor: pointer; transition: background .15s, border-color .15s; }
+.install-app-btn:hover { background: #fff; border-color: var(--color-primary); }
+.install-app-help { margin: 10px 4px 0; font-size: 13px; line-height: 1.45; color: var(--color-muted); }

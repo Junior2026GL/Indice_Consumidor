@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext.jsx';
 import { getErrorMessage } from '../../../services/api.js';
 import { PasswordField } from '../../../components/PasswordField.jsx';
+import { InstallAppButton } from '../../../components/InstallAppButton.jsx';
 import { IconUser, IconArrowRight, IconAlert } from '../../../components/icons.jsx';
 
 export default function LoginPage() {
@@ -93,6 +94,7 @@ export default function LoginPage() {
               {loading ? 'Ingresando...' : 'Ingresar'} <IconArrowRight />
             </button>
           </form>
+          <InstallAppButton />
         </div>
       </div>
     </div>

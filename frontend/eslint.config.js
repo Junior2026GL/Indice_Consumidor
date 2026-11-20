@@ -6,6 +6,7 @@ import prettier from 'eslint-config-prettier';
 
 export default [
   { ignores: ['dist/', 'node_modules/'] },
+  { files: ['public/sw.js'], languageOptions: { globals: { ...globals.serviceworker } } },
   js.configs.recommended,
   {
     files: ['src/**/*.{js,jsx}'],
