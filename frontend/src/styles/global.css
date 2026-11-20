@@ -3675,7 +3675,12 @@ tbody tr:last-child td { border-bottom: 0; }
 .consulta-menu-text strong { font-size: 16px; }
 .consulta-menu-text small { font-size: 13px; line-height: 1.35; color: var(--color-muted); }
 .consulta-menu-arrow { flex: none; color: #9aa6bd; }
-.consulta-back { margin-bottom: 12px; padding: 8px 4px; border: 0; background: none; font: inherit; font-weight: 700; font-size: 14px; color: var(--color-primary-dark); cursor: pointer; }
+.consulta-back { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 14px; padding: 0 18px 0 12px; border: 1px solid var(--color-border); border-radius: 999px; background: #fff; font: inherit; font-weight: 700; font-size: 14px; color: var(--color-primary-dark); box-shadow: 0 2px 8px rgba(11, 47, 107, .1); cursor: pointer; transition: background .15s, transform .12s, box-shadow .15s; }
+.consulta-back svg { display: grid; width: 26px; height: 26px; padding: 4px; border-radius: 50%; background: var(--color-primary-soft); transition: transform .15s; }
+.consulta-back:hover { background: #f4f7fd; box-shadow: 0 4px 12px rgba(11, 47, 107, .16); }
+.consulta-back:hover svg { transform: translateX(-2px); }
+.consulta-back:active { transform: scale(.97); }
+.consulta-back:focus-visible { outline: 3px solid rgba(11, 87, 208, .35); outline-offset: 2px; }
 
 /* Indemnización: buscar por DNI / por nombre */
 .consulta-by { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; margin-bottom: 16px; background: #e8edf6; border-radius: 12px; }

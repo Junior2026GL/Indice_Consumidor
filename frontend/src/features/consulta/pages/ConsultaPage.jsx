@@ -586,7 +586,20 @@ export default function ConsultaPage() {
 
         {mode && (
           <button type="button" className="consulta-back" onClick={() => changeMode(null)}>
-            ← Volver al menú
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m15 6-6 6 6 6" />
+            </svg>
+            Volver al menú
           </button>
         )}
 
