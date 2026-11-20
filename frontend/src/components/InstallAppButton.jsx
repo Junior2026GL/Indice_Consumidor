@@ -46,6 +46,7 @@ export function InstallAppButton() {
 
   return (
     <div className="install-app">
+      <div className="install-app-sep">o</div>
       <button type="button" className="install-app-btn" onClick={install}>
         <svg
           viewBox="0 0 24 24"
@@ -61,7 +62,7 @@ export function InstallAppButton() {
           <path d="M12 3v12m0 0-4-4m4 4 4-4" />
           <path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" />
         </svg>
-        Instalar App
+        Instalar App en tu dispositivo
       </button>
       {showIosHelp && (
         <p className="install-app-help">

@@ -93,8 +93,9 @@ export default function LoginPage() {
             <button className="btn-primary" disabled={loading}>
               {loading ? 'Ingresando...' : 'Ingresar'} <IconArrowRight />
             </button>
+
+            <InstallAppButton />
           </form>
-          <InstallAppButton />
         </div>
       </div>
     </div>
