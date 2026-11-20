@@ -10,6 +10,12 @@ const router = Router();
 // y marcar entregas, y anular las que ellos registraron; el Super Admin puede anular cualquiera
 // (la regla vive en el servicio).
 router.get('/buscar', searchLimiter, validate({ query: buscarQuery }), controller.buscar);
+router.get(
+  '/indemnizacion',
+  searchLimiter,
+  validate({ query: buscarQuery }),
+  controller.buscarIndemnizacion
+);
 router.post('/entrega', searchLimiter, validate({ body: entregaSchema }), controller.entregar);
 router.delete('/entrega/:dni', validate({ params: dniParams }), controller.anularEntrega);
 

@@ -13,6 +13,18 @@ export async function findByDni(dni) {
   return rows;
 }
 
+/** Indemnización por DNI (`identificador` es la clave primaria de esa tabla). */
+export async function findIndemnizacionByDni(dni) {
+  const [rows] = await db.query(
+    `SELECT numero, identificador, nombre, indemnizacion
+     FROM indemnizacion_ipc_insep
+     WHERE identificador = ?
+     LIMIT 1`,
+    [dni]
+  );
+  return rows[0] || null;
+}
+
 export async function existsByDni(dni) {
   const [rows] = await db.query('SELECT 1 FROM beneficiarios WHERE identificador = ? LIMIT 1', [dni]);
   return rows.length > 0;

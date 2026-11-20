@@ -21,6 +21,18 @@ export const buscar = asyncHandler(async (req, res) => {
   res.json({ ok: true, data });
 });
 
+export const buscarIndemnizacion = asyncHandler(async (req, res) => {
+  const data = await service.buscarIndemnizacion(req.query.dni);
+
+  await audit(
+    req,
+    AUDIT_ACCIONES.CONSULTAR,
+    `Consulta de indemnización del DNI ${masked(req.query.dni)} (${data.encontrado ? 'encontrado' : 'sin resultado'})`
+  );
+
+  res.json({ ok: true, data });
+});
+
 export const entregar = asyncHandler(async (req, res) => {
   const entrega = await service.marcarEntregado(req.body.dni, req.user);
   await audit(req, AUDIT_ACCIONES.ENTREGAR, `Entrega registrada al DNI ${masked(req.body.dni)}`);

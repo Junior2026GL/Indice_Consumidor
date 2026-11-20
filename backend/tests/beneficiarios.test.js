@@ -210,3 +210,38 @@ describe('DELETE /api/beneficiarios/entrega/:dni (anular)', () => {
     expect((await del(SUPER, '123')).status).toBe(400);
   });
 });
+
+describe('GET /api/beneficiarios/indemnizacion', () => {
+  const INDEM = { numero: 5, identificador: DNI, nombre: 'Juan López', indemnizacion: '12345.67890000' };
+  const get = (dni) => request(app).get('/api/beneficiarios/indemnizacion').query({ dni }).set(as(TUTOR));
+
+  it('exige iniciar sesión (401)', async () => {
+    const res = await request(app).get(`/api/beneficiarios/indemnizacion?dni=${DNI}`);
+    expect(res.status).toBe(401);
+    expect(touched('indemnizacion_ipc_insep')).toBe(false);
+  });
+
+  it('rechaza un DNI que no tiene 13 dígitos (400)', async () => {
+    const res = await get('123');
+    expect(res.status).toBe(400);
+    expect(touched('indemnizacion_ipc_insep')).toBe(false);
+  });
+
+  it('devuelve los datos y audita con el DNI enmascarado', async () => {
+    query.mockImplementation(async (sql) => {
+      if (sql.includes('WHERE u.id = ? AND u.activo = 1')) return [[TUTOR], undefined];
+      if (sql.includes('FROM indemnizacion_ipc_insep')) return [[INDEM], undefined];
+      return [[], undefined];
+    });
+    const res = await get(DNI);
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual({ encontrado: true, item: INDEM });
+    expect(JSON.stringify(audits())).not.toContain(DNI);
+  });
+
+  it('sin registro devuelve encontrado: false', async () => {
+    const res = await get(DNI);
+    expect(res.status).toBe(200);
+    expect(res.body.data).toEqual({ encontrado: false, item: null });
+  });
+});

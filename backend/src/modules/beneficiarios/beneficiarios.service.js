@@ -26,6 +26,11 @@ export async function buscarPorDni(dni, user) {
   };
 }
 
+export async function buscarIndemnizacion(dni) {
+  const item = await repository.findIndemnizacionByDni(dni);
+  return { encontrado: Boolean(item), item };
+}
+
 export async function marcarEntregado(dni, user) {
   if (!(await repository.existsByDni(dni))) {
     throw notFoundError('No se encontró un beneficiario con ese DNI');
